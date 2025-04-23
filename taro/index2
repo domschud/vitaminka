@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Stihiynetaro</title>
+	<style>
+		h1 {font-family: 'helvetica neue', helvetica, sans-serif;
+		Margin-left: 15px;
+		color: rgb(0,64,35);
+		}
+		p {font-style: italic;}		
+		button {
+			margin: 15px auto; /* автоматичне центрування по горизонталі */
+			font-family: 'helvetica neue', helvetica, sans-serif;
+        	letter-spacing: 1px;
+        	text-transform: uppercase;
+        	text-align: center;
+			border: 2px solid rgba(0,200,0,0.9);
+			background: rgba(0,200,0,0.4);
+			border-radius: 10px;
+			box-shadow: 1px 1px 2px rgba(0,0,200,0.3);
+ 			padding: 4px 20px;
+       		cursor: pointer;    
+    	}
+
+		p1, p3 {
+			font-family: 'helvetica neue', helvetica, sans-serif;
+		}
+
+		.image-block {
+			display: inline-block;
+			text-align: center;
+			margin: 5px auto; /* відступи зверху/знизу + автоматичне центрування */
+			padding: 5px; /* внутрішні відступи в середині блоку */
+		}
+
+		.image-block img {
+			width: 120px;
+			height: auto;
+			cursor: pointer;
+			display: block; /* щоб margin auto працював */
+			margin: 0 auto 10px; /* центрування + відступ знизу */
+			border-radius: 8px; /* трохи округлень, якщо хочеш ніжніший вигляд */
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* легка тінь */
+		}
+
+		#image4 {
+			height: 250px;
+			width: auto;
+			display: none; /* ховаємо всі зображення за замовчуванням */
+			margin: 20px auto; /* автоматичне центрування + відступи */
+		}
+
+		#result-container {
+			display: flex;
+			flex-wrap: wrap; /* дозволяє переносити */
+			justify-content: center;
+			gap: 10px;
+		}
+
+		#result-container img {
+			width: 190px;
+			max-width: 100%;
+			height: auto;
+			max-height: 320px;
+			transition: width 0.3s ease;
+			display: block;
+			margin: 3px auto;
+		}
+
+		#container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			max-width: 700px;
+			margin: 0 auto;
+			padding: 5px 2px;
+			flex-wrap: wrap;
+			box-sizing: border-box;
+			font-family: 'helvetica neue', helvetica, sans-serif;
+			font-style: italic;
+			color: #003322;
+		}
+</style>  
+</head>
+<body>
+	<div id="container">
+	<h1> Доброго ранку!</h1>  
+		<p> Що таке стихії? Це певний стан енергії, зі своїм ритмом, характером руху і можливостями. На протязі дня наша внутрішня енергія може переходити з одного стану в інший безліч разів, включаючи доступ до одних ресурсів та обмежуючи до інших. Включений Вогонь дає сили і рішучість, Вода м'якість та капризність, Повітря налаштовує на роздуми та відповідальність, а Земля на практичність і рутинні дії. Кожна ситуація, кожен момент попадає під опіку певної Стихії, подумай про ситуацію і тисни на кнопку, щоб дізнатись яка…</p>
+		<br><br>
+		<button id="generate-button4">Хочу стихію</button>
+		<br>
+		<img id="image4" src="sd2.jpg" alt="й дивись сюди">
+		<br><br>
+		<p>Гноми, Відьми, Оракули та Ілюзорні створіння, представники своїх Стихій, готові допомогти – через метафори, через асоціації і враження підкажуть ключові аспекти до задуманої ситуації, ядро навколо якого вона склалася чи точку фокусування, а також енергію що її супроводжує, якщо готові заглибитись, тисніть кнопку…</p><br>
+		<button id="generate-button3">В глибину</button>
+		<br>
+		<div id="result-container"></div>
+		<br>
+	</div>
+
+	<script>
+    const button4 = document.getElementById('generate-button4');
+  	const button3 = document.getElementById('generate-button3');
+    const image4 = document.getElementById('image4');
+	
+		const images4 = ['01sth.jpg', '02sth.jpg', '03sth.jpg', '04sth.jpg', '05sth.jpg', '06sth.jpg', '07sth.jpg', '08sth.jpg', '09sth.jpg', '10sth.jpg',
+		'11sth.jpg', '12sth.jpg', '13sth.jpg', '14sth.jpg', '15sth.jpg', '16sth.jpg', '17sth.jpg', '18sth.jpg', '19sth.jpg', '20sth.jpg',
+		'21sth.jpg', '22sth.jpg', '23sth.jpg', '24sth.jpg', '25sth.jpg', '26sth.jpg', '27sth.jpg', '28sth.jpg', '29sth.jpg', '30sth.jpg',
+		'31sth.jpg', '32sth.jpg', '33sth.jpg', '34sth.jpg', '35sth.jpg', '36sth.jpg', '37sth.jpg', '38sth.jpg', '39sth.jpg', '40sth.jpg',
+		'41sth.jpg', '42sth.jpg', '43sth.jpg', '44sth.jpg', '45sth.jpg', '46sth.jpg', '47sth.jpg', '48sth.jpg', '49sth.jpg', '50sth.jpg',
+		'51sth.jpg', '52sth.jpg', '53sth.jpg'];
+
+		const commonTitle = "На що дивитись?\nНапис зверху вказує на певний аспект прояву цієї стихії: рух, об'єм, сприйняття. Напис знизу показує її стан зараз або в задуманій ситуації.\n Земля – це стихія практичності, матеріальних аспектів, грошей, здоров'я, побуту, контроль над господарчими питаннями, стабільність та, іноді, інертність.\n Вода – це стихія емоційності, м'якості, капризності, дитячої відкритості та безтурботної легкості, а також гнучкості та мінливості.\n Вогонь – стихія творчості, енергії, активності, пристрасті та хаосу, в ній багато тепла, чутливості та разом з тим ризику та адреналіну.\n Повітря – стихія розуму, рішень, незалежності, самостійності, вміння брати на себе відповідальність, та в дечому холодність й байдужість";
+
+		button4.addEventListener('click', () => {
+			const randomIndex = Math.floor(Math.random() * images4.length);
+			image4.src = images4[randomIndex];
+			image4.style.display = 'block'; // показуємо зображення тільки після вибору
+			image4.title = commonTitle; // один і той самий title
+		});
+
+		// Оновлений блок для button3:
+		button3.addEventListener('click', () => { 
+			const taro = ['001tr.jpg', '002tr.jpg', '003tr.jpg', '004tr.jpg', '005tr.jpg', '006tr.jpg', '007tr.jpg', '008tr.jpg', '009tr.jpg', '010tr.jpg',
+		'011tr.jpg', '012tr.jpg', '013tr.jpg', '014tr.jpg', '015tr.jpg', '016tr.jpg', '017tr.jpg', '018tr.jpg', '019tr.jpg', '020tr.jpg',
+		'021tr.jpg', '022tr.jpg', '023tr.jpg', '024tr.jpg', '025tr.jpg', '026tr.jpg', '027tr.jpg', '028tr.jpg', '029tr.jpg', '030tr.jpg',
+		'031tr.jpg', '032tr.jpg', '033tr.jpg', '034tr.jpg', '035tr.jpg', '036tr.jpg', '037tr.jpg', '038tr.jpg', '039tr.jpg', '040tr.jpg',
+		'041tr.jpg', '042tr.jpg', '043tr.jpg', '044tr.jpg', '045tr.jpg', '046tr.jpg', '047tr.jpg', '048tr.jpg', '049tr.jpg', '050tr.jpg',
+		'051tr.jpg', '052tr.jpg', '053tr.jpg', '054tr.jpg', '055tr.jpg', '056tr.jpg', '057tr.jpg', '058tr.jpg', '059tr.jpg', '060tr.jpg',
+		'061tr.jpg', '062tr.jpg', '063tr.jpg', '064tr.jpg', '065tr.jpg', '066tr.jpg', '067tr.jpg', '068tr.jpg', '069tr.jpg', '070tr.jpg',
+		'071tr.jpg', '072tr.jpg', '073tr.jpg', '074tr.jpg', '075tr.jpg', '076tr.jpg', '077tr.jpg', '078tr.jpg', '079tr.jpg', '080tr.jpg',
+		'081tr.jpg', '082tr.jpg', '083tr.jpg', '084tr.jpg', '085tr.jpg', '086tr.jpg', '087tr.jpg', '088tr.jpg', '089tr.jpg', '090tr.jpg',
+		'091tr.jpg', '092tr.jpg', '093tr.jpg', '094tr.jpg', '095tr.jpg', '096tr.jpg', '097tr.jpg', '098tr.jpg', '099tr.jpg', '100tr.jpg',
+		'101tr.jpg', '102tr.jpg', '103tr.jpg', '104tr.jpg', '105tr.jpg', '106tr.jpg', '107tr.jpg', '108tr.jpg', '109tr.jpg', '110tr.jpg',
+		'111tr.jpg', '112tr.jpg', '113tr.jpg', '114tr.jpg', '115tr.jpg', '116tr.jpg', '117tr.jpg', '118tr.jpg', '119tr.jpg', '120tr.jpg',
+		'121tr.jpg', '122tr.jpg', '123tr.jpg', '124tr.jpg', '125tr.jpg', '126tr.jpg', '127tr.jpg', '128tr.jpg', '129tr.jpg', '130tr.jpg',
+		'131tr.jpg', '132tr.jpg', '133tr.jpg', '134tr.jpg', '135tr.jpg', '136tr.jpg', '137tr.jpg', '138tr.jpg', '139tr.jpg', '140tr.jpg',
+		'141tr.jpg', '142tr.jpg', '143tr.jpg', '144tr.jpg', '145tr.jpg', '146tr.jpg', '147tr.jpg', '148tr.jpg', '149tr.jpg', '150tr.jpg',
+		'151tr.jpg', '152tr.jpg', '153tr.jpg', '154tr.jpg', '155tr.jpg', '156tr.jpg', '157tr.jpg', '158tr.jpg', '159tr.jpg', '160tr.jpg',
+		'161tr.jpg', '162tr.jpg', '163tr.jpg', '164tr.jpg', '165tr.jpg', '166tr.jpg', '167tr.jpg', '168tr.jpg', '169tr.jpg', '170tr.jpg', 
+		'171tr.jpg', '172tr.jpg', '173tr.jpg', '174tr.jpg', '175tr.jpg', '176tr.jpg', '177tr.jpg', '178tr.jpg', '179tr.jpg', '180tr.jpg',
+		'181tr.jpg', '182tr.jpg', '183tr.jpg', '184tr.jpg', '185tr.jpg', '186tr.jpg', '187tr.jpg', '188tr.jpg', '189tr.jpg', '190tr.jpg',
+		'191tr.jpg', '192tr.jpg', '193tr.jpg', '194tr.jpg', '195tr.jpg', '196tr.jpg', '197tr.jpg', '198tr.jpg', '199tr.jpg', '200tr.jpg',
+		'201tr.jpg', '202tr.jpg', '203tr.jpg', '204tr.jpg', '205tr.jpg', '206tr.jpg', '207tr.jpg', '208tr.jpg', '209tr.jpg', '210tr.jpg',
+		'211tr.jpg', '212tr.jpg', '213tr.jpg', '214tr.jpg', '215tr.jpg', '216tr.jpg', '217tr.jpg', '218tr.jpg', '219tr.jpg', '220tr.jpg', 
+		'221tr.jpg', '222tr.jpg', '223tr.jpg', '224tr.jpg', '225tr.jpg', '226tr.jpg', '227tr.jpg', '228tr.jpg', '229tr.jpg', '230tr.jpg',
+		'231tr.jpg', '232tr.jpg', '233tr.jpg', '234tr.jpg', '235tr.jpg', '236tr.jpg', '237tr.jpg', '238tr.jpg', '239tr.jpg', '240tr.jpg',
+		'241tr.jpg', '242tr.jpg', '243tr.jpg', '244tr.jpg', '245tr.jpg', '246tr.jpg', '247tr.jpg', '248tr.jpg', '249tr.jpg', '250tr.jpg',
+		'251tr.jpg', '252tr.jpg', '253tr.jpg', '254tr.jpg', '255tr.jpg', '256tr.jpg', '257tr.jpg', '258tr.jpg', '259tr.jpg', '260tr.jpg',
+		'261tr.jpg', '262tr.jpg', '263tr.jpg', '264tr.jpg', '265tr.jpg', '266tr.jpg', '267tr.jpg', '268tr.jpg', '269tr.jpg', '270tr.jpg',
+		'271tr.jpg', '272tr.jpg', '273tr.jpg', '274tr.jpg', '275tr.jpg', '276tr.jpg', '277tr.jpg', '278tr.jpg', '279tr.jpg', '280tr.jpg',
+		'281tr.jpg', '282tr.jpg', '283tr.jpg', '284tr.jpg', '285tr.jpg', '286tr.jpg', '287tr.jpg', '288tr.jpg', '289tr.jpg', '290tr.jpg',
+		'291tr.jpg', '292tr.jpg', '293tr.jpg', '294tr.jpg', '295tr.jpg', '296tr.jpg', '297tr.jpg', '298tr.jpg', '299tr.jpg', '300tr.jpg',
+		'301tr.jpg', '302tr.jpg', '303tr.jpg', '304tr.jpg', '305tr.jpg', '306tr.jpg', '307tr.jpg', '308tr.jpg', '309tr.jpg', '310tr.jpg',
+		'311tr.jpg', '312tr.jpg']; 
+		const zem = ['01zm.jpg', '02zm.jpg', '03zm.jpg', '04zm.jpg', '05zm.jpg', '06zm.jpg', '07zm.jpg', '08zm.jpg', '09zm.jpg', '10zm.jpg', '11zm.jpg', '12zm.jpg', '13zm.jpg', '14zm.jpg'];
+		const vod = ['01vd.jpg', '02vd.jpg', '03vd.jpg', '04vd.jpg', '05vd.jpg', '06vd.jpg', '07vd.jpg', '08vd.jpg', '09vd.jpg', '10vd.jpg', '11vd.jpg', '12vd.jpg', '13vd.jpg', '14vd.jpg'];
+		const vog = ['01og.jpg', '02og.jpg', '03og.jpg', '04og.jpg', '05og.jpg', '06og.jpg', '07og.jpg', '08og.jpg', '09og.jpg', '10og.jpg', '11og.jpg', '12og.jpg', '13og.jpg', '14og.jpg'];
+		const pov = ['01vz.jpg', '02vz.jpg', '03vz.jpg', '04vz.jpg', '05vz.jpg', '06vz.jpg', '07vz.jpg', '08vz.jpg', '09vz.jpg', '10vz.jpg', '11vz.jpg', '12vz.jpg', '13vz.jpg', '14vz.jpg'];
+
+		const resultContainer = document.getElementById('result-container');
+		resultContainer.innerHTML = ""; // Очищення
+
+		let randomTaroIndex = Math.floor(Math.random() * taro.length);
+		let coreImage = taro[randomTaroIndex];
+
+		let coreBlock = document.createElement('div');
+		coreBlock.className = 'image-block';
+
+		let coreLabel = document.createElement('div');
+		coreLabel.textContent = `Точка фокусу`;
+		coreBlock.appendChild(coreLabel);
+
+		let coreImg = document.createElement('img');
+		coreImg.src = coreImage;
+		coreImg.title = "Загальні риси карт:\n\nЧаші (Кубки) – Жива Вода (Задоволення – достаток, емоції, накопичення)\nБулави (Жезли) – Вічний Вогонь(Повсякдення, працелюбність, влада, управління, побут)\nДенарії (Монети, Пентаклі) – Мати-Земля (Прибуток/Дохід, практичність, успіх, влучний момент)\nМечі – Одвічний Вітер (Воля до Перемоги, концентрація, боротьба, завоювання)\n\nІєрархія персонажів:\nПерсонажі 1-22(Старші аркани) – відображають глобальні сили та процеси, вони як загальні погодні умови, з якими варто рахуватись\nКоролі/Королеви, Лицарі/Дами, Пажі – частіше символізують деяку «пропозицію» вам від цієї стихії, можливість, яку ви можете розглянути й прийняти\nІнші - більше відображають наявну чи попереджають про можливу ситуацію, залежності від контексту ";
+		coreBlock.appendChild(coreImg);
+
+		resultContainer.appendChild(coreBlock);
+
+		let energyArray = [];
+		let energyType = "";
+
+			if (randomTaroIndex >= 0 && randomTaroIndex <= 77) {
+				energyArray = zem;
+				energyType = "матеріального рівня<br>(стихія земля)";
+			} else if (randomTaroIndex >= 78 && randomTaroIndex <= 155) {
+				energyArray = vod;
+				energyType = "емоційного рівня<br>(стихія вода)";
+			} else if (randomTaroIndex >= 156 && randomTaroIndex <= 233) {
+				energyArray = vog;
+				energyType = "творчого рівня<br>(стихія вогню)";
+			} else if (randomTaroIndex >= 234 && randomTaroIndex <= 311) {
+				energyArray = pov;
+				energyType = "ментального рівня<br>(стихія повітря)";
+			}
+			if (energyArray.length > 0) {
+				let randomEnergyIndex = Math.floor(Math.random() * energyArray.length);
+				let energyImage = energyArray[randomEnergyIndex];
+
+		let energyBlock = document.createElement('div');
+		energyBlock.className = 'image-block';
+
+		let energyLabel = document.createElement('div');
+		energyLabel.innerHTML = `Енергії ${energyType}`;
+		energyBlock.appendChild(energyLabel);
+
+		let energyImg = document.createElement('img');
+		energyImg.src = energyImage;
+		energyImg.title = commonTitle; // той самий загальний title
+		energyBlock.appendChild(energyImg);
+
+		resultContainer.appendChild(energyBlock);
+	}
+});
+	</script>
+</body>
+</html>
