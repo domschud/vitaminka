@@ -11,7 +11,7 @@
 		}
 		p {font-style: italic;}		
 		button {
-			margin: 5px auto; /* автоматичне центрування по горизонталі */
+			margin: 15px auto; /* автоматичне центрування по горизонталі */
 			font-family: 'helvetica neue', helvetica, sans-serif;
         	letter-spacing: 1px;
         	text-transform: uppercase;
@@ -31,8 +31,8 @@
 		.image-block {
 			display: inline-block;
 			text-align: center;
-			margin: 3px auto; /* відступи зверху/знизу + автоматичне центрування */
-			padding: 3px; /* внутрішні відступи в середині блоку */
+			margin: 5px auto; /* відступи зверху/знизу + автоматичне центрування */
+			padding: 5px; /* внутрішні відступи в середині блоку */
 		}
 
 		.image-block img {
@@ -60,7 +60,7 @@
 		}
 
 		#result-container img {
-			width: 200px;
+			width: 190px;
 			max-width: 100%;
 			height: auto;
 			max-height: 320px;
@@ -82,6 +82,36 @@
 			font-style: italic;
 			color: #003322;
 		}
+
+    .tooltip {
+      position: absolute;
+      background-color: #fffce8;
+      color: #333;
+      border: 1px solid #aaa;
+      padding: 8px 12px 12px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      font-size: 14px;
+      max-width: 300px;
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none;
+    }
+
+    .tooltip .close-tooltip {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      color: #444;
+    }
+
+    .tooltip-content {
+      margin-top: 20px;
+    }
 </style>  
 </head>
 <body>
@@ -92,19 +122,24 @@
 		<button id="generate-button4">Хочу стихію</button>
 		<br>
 		<img id="image4" src="sd2.jpg" alt="й дивись сюди">
-		<br><br>
+ 		<br><br>
 		<p>Гноми, Відьми, Оракули та Ілюзорні створіння, представники своїх Стихій, готові допомогти – через метафори, через асоціації і враження підкажуть ключові аспекти до задуманої ситуації, ядро навколо якого вона склалася чи точку фокусування, а також енергію що її супроводжує, якщо готові заглибитись, тисніть кнопку…</p><br>
 		<button id="generate-button3">В глибину</button>
 		<br>
 		<div id="result-container"></div>
 		<br>
+    <div id="tooltip" class="tooltip">
+      <span class="close-tooltip">&times;</span>
+      <div class="tooltip-content"></div>
+    </div>
 	</div>
 
 	<script>
     const button4 = document.getElementById('generate-button4');
   	const button3 = document.getElementById('generate-button3');
     const image4 = document.getElementById('image4');
-	
+    const image4info = document.getElementById('image4info');
+    	
 		const images4 = ['01sth.jpg', '02sth.jpg', '03sth.jpg', '04sth.jpg', '05sth.jpg', '06sth.jpg', '07sth.jpg', '08sth.jpg', '09sth.jpg', '10sth.jpg',
 		'11sth.jpg', '12sth.jpg', '13sth.jpg', '14sth.jpg', '15sth.jpg', '16sth.jpg', '17sth.jpg', '18sth.jpg', '19sth.jpg', '20sth.jpg',
 		'21sth.jpg', '22sth.jpg', '23sth.jpg', '24sth.jpg', '25sth.jpg', '26sth.jpg', '27sth.jpg', '28sth.jpg', '29sth.jpg', '30sth.jpg',
@@ -112,14 +147,42 @@
 		'41sth.jpg', '42sth.jpg', '43sth.jpg', '44sth.jpg', '45sth.jpg', '46sth.jpg', '47sth.jpg', '48sth.jpg', '49sth.jpg', '50sth.jpg',
 		'51sth.jpg', '52sth.jpg', '53sth.jpg'];
 
-		const commonTitle = "На що дивитись?\nНапис зверху вказує на певний аспект прояву цієї стихії: рух, об'єм, сприйняття. Напис знизу показує її стан зараз або в задуманій ситуації.\n Земля – це стихія практичності, матеріальних аспектів, грошей, здоров'я, побуту, контроль над господарчими питаннями, стабільність та, іноді, інертність.\n Вода – це стихія емоційності, м'якості, капризності, дитячої відкритості та безтурботної легкості, а також гнучкості та мінливості.\n Вогонь – стихія творчості, енергії, активності, пристрасті та хаосу, в ній багато тепла, чутливості та разом з тим ризику та адреналіну.\n Повітря – стихія розуму, рішень, незалежності, самостійності, вміння брати на себе відповідальність, та в дечому холодність й байдужість";
+		const commonTitle =  `
+  <div style="font-family: Georgia, serif; font-size: 14px; line-height: 1.5;">
+    <p><strong>На що дивитись?</strong> Напис зверху вказує на аспект стихії: рух, об'єм, сприйняття.</p>
+    <p><em>Напис знизу показує її стан зараз або в задуманій ситуації.\n Земля – це стихія практичності, матеріальних аспектів, грошей, здоров'я, побуту, контроль над господарчими питаннями, стабільність та, іноді, інертність.</em> <br> 
+    <span style="color: green;">Земля</span> - це стихія практичності, матеріальних аспектів, грошей, здоров'я, побуту, контроль над господарчими питаннями, стабільність та, іноді, інертність.<br>
+    <span style="color: blue;">Вода</span> – це стихія емоційності, м'якості, капризності, дитячої відкритості та безтурботної легкості, а також гнучкості та мінливості.<br>
+    <span style="color: red;">Вогонь</span> – стихія творчості, енергії, активності, пристрасті та хаосу, в ній багато тепла, чутливості та разом з тим ризику та адреналіну.<br>
+    <span style="color: gray;">Повітря</span> – стихія розуму, рішень, незалежності, самостійності, вміння брати на себе відповідальність, та в дечому холодність й байдужість.</p>
+  </div>
+`;
 
-		button4.addEventListener('click', () => {
-			const randomIndex = Math.floor(Math.random() * images4.length);
-			image4.src = images4[randomIndex];
-			image4.style.display = 'block'; // показуємо зображення тільки після вибору
-			image4.title = commonTitle; // один і той самий title
-		});
+    image4.addEventListener('click', (e) => {
+      showTooltip(e, commonTitle);
+    });
+
+    function showTooltip(event, text) {
+    const tooltip = document.getElementById('tooltip');
+    const content = tooltip.querySelector('.tooltip-content');
+    content.innerHTML = text;
+    tooltip.style.display = 'block';
+    tooltip.style.left = `${event.pageX + 10}px`;
+    tooltip.style.top = `${event.pageY + 10}px`;
+  }
+
+  document.querySelector('.close-tooltip').addEventListener('click', () => {
+  document.getElementById('tooltip').style.display = 'none';
+});
+
+    button4.addEventListener('click', () => {
+    const randomIndex = Math.floor(Math.random() * images4.length);
+    image4.src = images4[randomIndex];
+    image4.style.display = 'block';
+    
+    image4info.style.display = 'inline';
+    image4info.title = commonTitle;
+  });
 
 		// Оновлений блок для button3:
 		button3.addEventListener('click', () => { 
@@ -175,46 +238,87 @@
 
 		let coreImg = document.createElement('img');
 		coreImg.src = coreImage;
-		coreImg.title = "Загальні риси карт:\n\nЧаші (Кубки) – Жива Вода (Задоволення – достаток, емоції, накопичення)\nБулави (Жезли) – Вічний Вогонь(Повсякдення, працелюбність, влада, управління, побут)\nДенарії (Монети, Пентаклі) – Мати-Земля (Прибуток/Дохід, практичність, успіх, влучний момент)\nМечі – Одвічний Вітер (Воля до Перемоги, концентрація, боротьба, завоювання)\n\nІєрархія персонажів:\nПерсонажі 1-22(Старші аркани) – відображають глобальні сили та процеси, вони як загальні погодні умови, з якими варто рахуватись\nКоролі/Королеви, Лицарі/Дами, Пажі – частіше символізують деяку «пропозицію» вам від цієї стихії, можливість, яку ви можете розглянути й прийняти\nІнші - більше відображають наявну чи попереджають про можливу ситуацію, залежності від контексту ";
-		coreBlock.appendChild(coreImg);
+		const coreTooltip = `
+  <div style="font-family: Georgia, serif; font-size: 14px; line-height: 1.5;">
+    <p><strong>Загальні риси карт:</strong></p>
+    <p>
+      <strong>Чаші (Кубки)</strong> – <em>Жива Вода</em><br>
+      Задоволення – достаток, емоції, накопичення
+    </p>
+    <p>
+      <strong>Булави (Жезли)</strong> – <em>Вічний Вогонь</em><br>
+      Повсякдення, працелюбність, влада, управління, побут
+    </p>
+    <p>
+      <strong>Денарії (Монети, Пентаклі)</strong> – <em>Мати-Земля</em><br>
+      Прибуток/Дохід, практичність, успіх, влучний момент
+    </p>
+    <p>
+      <strong>Мечі</strong> – <em>Одвічний Вітер</em><br>
+      Воля до Перемоги, концентрація, боротьба, завоювання
+    </p>
+    <hr style="margin: 10px 0;">
+    <p><strong>Ієрархія персонажів:</strong></p>
+    <p>
+      <strong>1–22 (Старші аркани)</strong> – глобальні сили та процеси.<br>
+      Вони як загальні погодні умови, з якими варто рахуватись.
+    </p>
+    <p>
+      <strong>Королі / Королеви, Лицарі / Дами, Пажі</strong> –<br>
+      зазвичай символізують «пропозицію» від стихії: можливість, яку можна розглянути.
+    </p>
+    <p>
+      <strong>Інші карти</strong> – частіше про поточну чи можливу ситуацію,<br>
+      у залежності від контексту.
+    </p>
+  </div>
+`;
+    coreImg.addEventListener('click', (e) => {
+  showTooltip(e, coreTooltip);
+});    
 
-		resultContainer.appendChild(coreBlock);
+      coreBlock.appendChild(coreImg);
+      resultContainer.appendChild(coreBlock);
 
-		let energyArray = [];
-		let energyType = "";
+      let energyArray = [];
+      let energyType = "";
 
-			if (randomTaroIndex >= 0 && randomTaroIndex <= 77) {
-				energyArray = zem;
-				energyType = "матеріального рівня<br>(стихія земля)";
-			} else if (randomTaroIndex >= 78 && randomTaroIndex <= 155) {
-				energyArray = vod;
-				energyType = "емоційного рівня<br>(стихія вода)";
-			} else if (randomTaroIndex >= 156 && randomTaroIndex <= 233) {
-				energyArray = vog;
-				energyType = "творчого рівня<br>(стихія вогню)";
-			} else if (randomTaroIndex >= 234 && randomTaroIndex <= 311) {
-				energyArray = pov;
-				energyType = "ментального рівня<br>(стихія повітря)";
-			}
-			if (energyArray.length > 0) {
-				let randomEnergyIndex = Math.floor(Math.random() * energyArray.length);
-				let energyImage = energyArray[randomEnergyIndex];
+      if (randomTaroIndex >= 0 && randomTaroIndex <= 77) {
+        energyArray = zem;
+        energyType = "матеріального рівня<br>(стихія земля)";
+      } else if (randomTaroIndex >= 78 && randomTaroIndex <= 155) {
+        energyArray = vod;
+        energyType = "емоційного рівня<br>(стихія вода)";
+      } else if (randomTaroIndex >= 156 && randomTaroIndex <= 233) {
+        energyArray = vog;
+        energyType = "творчого рівня<br>(стихія вогню)";
+      } else if (randomTaroIndex >= 234 && randomTaroIndex <= 311) {
+        energyArray = pov;
+        energyType = "ментального рівня<br>(стихія повітря)";
+      }
 
-		let energyBlock = document.createElement('div');
-		energyBlock.className = 'image-block';
+      if (energyArray.length > 0) {
+        const randomEnergyIndex = Math.floor(Math.random() * energyArray.length);
+        const energyImage = energyArray[randomEnergyIndex];
 
-		let energyLabel = document.createElement('div');
-		energyLabel.innerHTML = `Енергії ${energyType}`;
-		energyBlock.appendChild(energyLabel);
+        const energyBlock = document.createElement('div');
+        energyBlock.className = 'image-block';
 
-		let energyImg = document.createElement('img');
-		energyImg.src = energyImage;
-		energyImg.title = commonTitle; // той самий загальний title
-		energyBlock.appendChild(energyImg);
+        const energyLabel = document.createElement('div');
+        energyLabel.innerHTML = `Енергії ${energyType}`;
+        energyBlock.appendChild(energyLabel);
 
-		resultContainer.appendChild(energyBlock);
-	}
-});
+        const energyImg = document.createElement('img');
+        energyImg.src = energyImage;
+        energyImg.style.cursor = "pointer";
+        energyImg.addEventListener('click', (e) => {
+          showTooltip(e, commonTitle);
+        });
+
+        energyBlock.appendChild(energyImg);
+        resultContainer.appendChild(energyBlock);
+      }
+    });
 	</script>
 </body>
 </html>
