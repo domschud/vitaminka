@@ -167,8 +167,8 @@
     const content = tooltip.querySelector('.tooltip-content');
     content.innerHTML = text;
     tooltip.style.display = 'block';
-    tooltip.style.left = `${event.pageX + 10}px`;
-    tooltip.style.top = `${event.pageY + 10}px`;
+    tooltip.style.left = `${event.pageX - 100}px`;
+    tooltip.style.top = `${event.pageY - 100}px`;
   }
 
   document.querySelector('.close-tooltip').addEventListener('click', () => {
